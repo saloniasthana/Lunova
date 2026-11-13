@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: lunova-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lunova
+      POSTGRES_PASSWORD: lunova
+      POSTGRES_DB: lunova
+    ports:
+      - "5433:5432"
+    volumes:
+      - lunova-data:/var/lib/postgresql/data
+
+volumes:
+  lunova-data:

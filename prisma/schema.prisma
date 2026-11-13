@@ -1,0 +1,320 @@
+// Lunova database schema
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  DONE
+}
+
+enum SessionType {
+  FOCUS
+  SHORT_BREAK
+  LONG_BREAK
+}
+
+// ───────────────────────── Auth (Auth.js) ─────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  tasks            Task[]
+  categories       Category[]
+  projects         Project[]
+  focusSessions    FocusSession[]
+  habits           Habit[]
+  habitCompletions HabitCompletion[]
+  calendarEvents   CalendarEvent[]
+  timeBlocks       TimeBlock[]
+  settings         UserSettings?
+  gardenRewards    GardenReward[]
+  soundMixes       SoundMix[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ───────────────────────── Tasks ─────────────────────────
+
+model Category {
+  id     String  @id @default(cuid())
+  userId String
+  name   String
+  color  String
+  icon   String?
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  color       String
+  createdAt   DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Task {
+  id                String     @id @default(cuid())
+  userId            String
+  title             String
+  description       String?    @db.Text
+  notes             String?    @db.Text
+  priority          Priority   @default(MEDIUM)
+  status            TaskStatus @default(TODO)
+  categoryId        String?
+  projectId         String?
+  dueDate           String? // YYYY-MM-DD in the user's local calendar
+  dueTime           String? // HH:mm
+  estimatedDuration Int? // minutes
+  tags              String[]   @default([])
+  position          Int        @default(0)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  completedAt       DateTime?
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  project       Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  subtasks      Subtask[]
+  focusSessions FocusSession[]
+  timeBlocks    TimeBlock[]
+  events        CalendarEvent[]
+
+  @@index([userId, status])
+  @@index([userId, dueDate])
+}
+
+model Subtask {
+  id        String   @id @default(cuid())
+  taskId    String
+  title     String
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+// ───────────────────────── Focus ─────────────────────────
+
+model FocusSession {
+  id              String      @id @default(cuid())
+  userId          String
+  taskId          String?
+  sessionType     SessionType
+  plannedDuration Int // seconds
+  actualDuration  Int // seconds
+  startedAt       DateTime
+  endedAt         DateTime
+  completed       Boolean     @default(false)
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([userId, startedAt])
+  @@index([taskId])
+}
+
+// ───────────────────────── Habits ─────────────────────────
+
+model Habit {
+  id           String    @id @default(cuid())
+  userId       String
+  name         String
+  description  String?
+  icon         String    @default("sparkles")
+  color        String    @default("#A8C7E8")
+  frequency    String    @default("daily") // daily | weekdays | weekends | custom
+  days         Int[]     @default([]) // 0=Sun..6=Sat, used when frequency = custom
+  target       Int       @default(1)
+  reminderTime String?
+  startDate    String // YYYY-MM-DD
+  paused       Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completions HabitCompletion[]
+
+  @@index([userId])
+}
+
+model HabitCompletion {
+  id             String   @id @default(cuid())
+  habitId        String
+  userId         String
+  completionDate String // YYYY-MM-DD (user local date)
+  completedAt    DateTime @default(now())
+
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, completionDate])
+  @@index([userId, completionDate])
+}
+
+// ───────────────────────── Planning ─────────────────────────
+
+model CalendarEvent {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  description   String?
+  startDateTime DateTime
+  endDateTime   DateTime
+  category      String   @default("personal")
+  taskId        String?
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([userId, startDateTime])
+}
+
+model TimeBlock {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String // YYYY-MM-DD
+  startMin  Int // minutes from midnight
+  endMin    Int
+  title     String
+  color     String   @default("blue")
+  taskId    String?
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+}
+
+// ───────────────────────── Personalisation ─────────────────────────
+
+model UserSettings {
+  id                      String  @id @default(cuid())
+  userId                  String  @unique
+  theme                   String  @default("cloud")
+  accentColor             String?
+  wallpaper               String  @default("none")
+  font                    String  @default("nunito")
+  focusDuration           Int     @default(25)
+  shortBreakDuration      Int     @default(5)
+  longBreakDuration       Int     @default(15)
+  sessionsBeforeLongBreak Int     @default(4)
+  autoStartBreaks         Boolean @default(false)
+  autoStartFocus          Boolean @default(false)
+  musicVolume             Int     @default(60)
+  completionSound         Boolean @default(true)
+  companionEnabled        Boolean @default(true)
+  companionType           String  @default("cat")
+  companionSize           String  @default("md")
+  companionAccessory      String  @default("none")
+  notificationsEnabled    Boolean @default(false)
+  showQuotes              Boolean @default(true)
+  showMusicPlayer         Boolean @default(true)
+  focusArea               String  @default("everything")
+  workStartMin            Int     @default(540)
+  workEndMin              Int     @default(1080)
+  onboarded               Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GardenReward {
+  id         String   @id @default(cuid())
+  userId     String
+  rewardType String // plant | flower | tree | decor | pot
+  rewardName String // catalog key
+  unlockedAt DateTime @default(now())
+  selected   Boolean  @default(true)
+  x          Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, rewardName])
+  @@index([userId])
+}
+
+model SoundMix {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  levels    Json // { rain: 0.6, fire: 0.2, ... }
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

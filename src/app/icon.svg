@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9DC2EA"/>
+      <stop offset="0.55" stop-color="#C3BDF0"/>
+      <stop offset="1" stop-color="#F2C6DC"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.42" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="moon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FFF4E6"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+  <circle cx="230" cy="262" r="190" fill="url(#glow)"/>
+  <!-- crescent moon -->
+  <path d="M300 118a148 148 0 1 0 82 262A122 122 0 0 1 300 118Z" fill="url(#moon)"/>
+  <!-- sparkles -->
+  <path d="M362 104l13 30 30 13-30 13-13 30-13-30-30-13 30-13Z" fill="#fff"/>
+  <path d="M410 214l7 15 15 7-15 7-7 15-7-15-15-7 15-7Z" fill="#fff" opacity="0.85"/>
+  <circle cx="128" cy="128" r="9" fill="#fff" opacity="0.8"/>
+  <circle cx="402" cy="392" r="7" fill="#fff" opacity="0.7"/>
+</svg>

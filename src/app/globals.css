@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="night"], [data-theme="night"] *));
+
+/* ───────────── Theme tokens ─────────────
+   Every theme is just a set of variables. Components only use the
+   semantic Tailwind colours below (bg-surface, text-ink, bg-accent…). */
+:root,
+[data-theme="cloud"] {
+  --bg: #faf9f6;
+  --bg-2: #f3f0eb;
+  --card: #ffffff;
+  --accent: #a8c7e8;
+  --accent-strong: #5f8fc4;
+  --accent-soft: #e8f1fa;
+  --lavender: #dccbf3;
+  --pink: #f4d5de;
+  --green: #d7e8d5;
+  --peach: #f8dcc8;
+  --ink: #34343b;
+  --muted: #85838b;
+  --line: #ece8e2;
+  --success: #a9d6b0;
+  --warning: #f4d6a0;
+  --danger: #e8a5a5;
+  --shadow: 52 52 59;
+  --glow-1: #e3eefa;
+  --glow-2: #efe7fb;
+}
+
+[data-theme="lavender"] {
+  --bg: #faf8fc;
+  --bg-2: #f2edf8;
+  --card: #ffffff;
+  --accent: #c9b3ec;
+  --accent-strong: #8a68c4;
+  --accent-soft: #f1eafb;
+  --lavender: #e2d4f6;
+  --glow-1: #efe5fb;
+  --glow-2: #fbe8f0;
+}
+
+[data-theme="sakura"] {
+  --bg: #fdf8f8;
+  --bg-2: #f8eeef;
+  --card: #ffffff;
+  --accent: #f0b9c8;
+  --accent-strong: #c96f8a;
+  --accent-soft: #fcebf0;
+  --line: #f0e4e4;
+  --glow-1: #fde8ee;
+  --glow-2: #fff3e6;
+}
+
+[data-theme="mint"] {
+  --bg: #f8faf6;
+  --bg-2: #eef3ea;
+  --card: #ffffff;
+  --accent: #b5dbc0;
+  --accent-strong: #5d9c70;
+  --accent-soft: #e8f4ea;
+  --line: #e5ebe1;
+  --glow-1: #e5f3e6;
+  --glow-2: #f6f2df;
+}
+
+[data-theme="peach"] {
+  --bg: #fdf9f5;
+  --bg-2: #f8efe6;
+  --card: #ffffff;
+  --accent: #f6c5a5;
+  --accent-strong: #cc7d4c;
+  --accent-soft: #fdeee3;
+  --line: #f0e6dc;
+  --glow-1: #fde9da;
+  --glow-2: #fbe3e6;
+}
+
+[data-theme="cream"] {
+  --bg: #fbf7f0;
+  --bg-2: #f3ebdf;
+  --card: #fffdf9;
+  --accent: #d9bf9b;
+  --accent-strong: #9c7447;
+  --accent-soft: #f6ecdd;
+  --ink: #3d352d;
+  --muted: #8d8173;
+  --line: #ebe1d3;
+  --glow-1: #f6ead7;
+  --glow-2: #efe5d8;
+}
+
+[data-theme="night"] {
+  --bg: #1d2033;
+  --bg-2: #24283e;
+  --card: #2a2e47;
+  --accent: #9fa8e0;
+  --accent-strong: #b8bff0;
+  --accent-soft: #343a5c;
+  --lavender: #5d5383;
+  --pink: #6b4a5d;
+  --green: #3f5b4f;
+  --peach: #6a5246;
+  --ink: #eceaf4;
+  --muted: #a3a2b8;
+  --line: #363b58;
+  --success: #6fae7c;
+  --warning: #c9a464;
+  --danger: #c98080;
+  --shadow: 0 0 0;
+  --glow-1: #2b3058;
+  --glow-2: #3a2f55;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-lavender: var(--lavender);
+  --color-pink: var(--pink);
+  --color-green: var(--green);
+  --color-peach: var(--peach);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--app-font), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-nunito), var(--app-font), ui-sans-serif, sans-serif;
+
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-3xl: 24px;
+
+  --shadow-soft: 0 1px 2px rgb(var(--shadow) / 0.04), 0 4px 16px rgb(var(--shadow) / 0.05);
+  --shadow-lift: 0 2px 4px rgb(var(--shadow) / 0.05), 0 12px 32px rgb(var(--shadow) / 0.08);
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-breathe: breathe 4s ease-in-out infinite;
+  --animate-twinkle: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ───────────── Base ───────────── */
+html {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  transition: background-color 400ms ease, color 400ms ease;
+}
+
+[data-font="nunito"] { --app-font: var(--font-nunito); }
+[data-font="inter"] { --app-font: var(--font-inter); }
+[data-font="jakarta"] { --app-font: var(--font-jakarta); }
+[data-font="dmsans"] { --app-font: var(--font-dmsans); }
+:root { --app-font: var(--font-nunito); }
+
+*:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Soft scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+/* Wallpaper layer sits behind the app shell */
+.wallpaper-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 500ms ease;
+}
+
+/* Range input styling (volume sliders etc.) */
+input[type="range"].lun-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--accent-strong) var(--fill, 50%), var(--line) var(--fill, 50%));
+  cursor: pointer;
+}
+input[type="range"].lun-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 2px solid var(--accent-strong);
+  box-shadow: 0 1px 4px rgb(var(--shadow) / 0.15);
+}
+input[type="range"].lun-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 2px solid var(--accent-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dialogIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Card & sidebar appearance (Customize → Layout) */
+[data-cards="flat"] .lun-card { box-shadow: none; }
+[data-cards="glass"] .lun-card {
+  background: color-mix(in oklab, var(--card) 72%, transparent);
+  backdrop-filter: blur(16px);
+  border-color: color-mix(in oklab, var(--line) 70%, transparent);
+}
+[data-sidebar="tinted"] .lun-sidebar { background: color-mix(in oklab, var(--accent-soft) 85%, transparent); }
